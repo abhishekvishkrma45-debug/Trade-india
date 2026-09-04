@@ -1,118 +1,134 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<title>Codebeautify.org Text to HTML Converter</title>
-	</head>
-	<body>
-		<p>
-			<!DOCTYPE html>
-			<html lang="hi">
-				<head>
-					<meta charset="UTF-8">
-						<meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<title>Colour Trading Game</title>
-							<style> 
-        body { font-family: Arial, sans-serif; text-align: center; background: #121212; color: white; padding: 20px; } 
-        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); } 
-        .wallet { font-size: 22px; margin-bottom: 15px; color: #4caf50; } 
-        .timer { font-size: 18px; color: #ffeb3b; margin-bottom: 20px; } 
-        .btn { padding: 12px 24px; font-size: 16px; border: none; cursor: pointer; border-radius: 6px; margin: 5px; font-weight: bold; } 
-        .green { background: #4caf50; color: white; } 
-        .red { background: #f44336; color: white; } 
-        .violet { background: #9c27b0; color: white; } 
-        .history { margin-top: 20px; text-align: left; } 
-        .history-item { padding: 8px; border-bottom: 1px solid #333; } 
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colour Trading Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #121212; color: white; padding: 20px; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .wallet { font-size: 22px; margin-bottom: 15px; color: #4caf50; }
+        .timer { font-size: 18px; color: #ffeb3b; margin-bottom: 20px; }
+        .bet-box { margin: 15px 0; }
+        .bet-input { padding: 10px; font-size: 16px; border-radius: 6px; border: 1px solid #444; width: 120px; text-align: center; background: #222; color: white; }
+        .quick-btn { padding: 6px 12px; font-size: 12px; margin: 3px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; }
+        .btn { padding: 12px 24px; font-size: 16px; border: none; cursor: pointer; border-radius: 6px; margin: 5px; font-weight: bold; }
+        .green { background: #4caf50; color: white; }
+        .red { background: #f44336; color: white; }
+        .violet { background: #9c27b0; color: white; }
+        .history { margin-top: 20px; text-align: left; }
+        .history-item { padding: 8px; border-bottom: 1px solid #333; }
     </style>
-						</head>
-						<body>
-							<div class="card">
-								<h2>Colour Prediction Game</h2>
-								<div class="wallet">Coins: ₹
-									<span id="balance">1000</span>
-								</div>
-								<div class="timer">Agla Result: 
-									<span id="timer">10</span>s
-								</div>
-								<p>Apna Colour Chune (Bet: ₹100):</p>
-								<button class="btn green" onclick="placeBet('Green')">Green (2x)</button>
-								<button class="btn red" onclick="placeBet('Red')">Red (2x)</button>
-								<button class="btn violet" onclick="placeBet('Violet')">Violet (4.5x)</button>
-								<p id="status" style="margin-top: 15px; font-weight: bold;"></p>
-								<div class="history">
-									<h3>Previous Results:</h3>
-									<div id="history-list"></div>
-								</div>
-							</div>
-							<script> 
-    let balance = 1000; 
-    let selectedColour = null; 
-    let betAmount = 100; 
-    let timeLeft = 10; 
- 
-    function updateTimer() { 
-        document.getElementById('timer').innerText = timeLeft; 
-        if (timeLeft === 0) { 
-            calculateResult(); 
-            timeLeft = 10; 
-        } else { 
-            timeLeft--; 
-        } 
-    } 
- 
-    setInterval(updateTimer, 1000); 
- 
-    function placeBet(colour) { 
-        if (balance < betAmount) { 
-            document.getElementById('status').innerText = "Insufficent Balance!"; 
-            document.getElementById('status').style.color = "red"; 
-            return; 
-        } 
-        selectedColour = colour; 
-        document.getElementById('status').innerText = "Bet Placed on: " + colour; 
-        document.getElementById('status').style.color = "#ffeb3b"; 
-    } 
- 
-    function calculateResult() { 
-        let randomIndex = Math.floor(Math.random() * 10); 
-        let winningColour = ''; 
-         
-        if (randomIndex === 0) winningColour = 'Violet'; 
-        else if (randomIndex % 2 === 0) winningColour = 'Green'; 
-        else winningColour = 'Red'; 
- 
-        let statusText = "Result: " + winningColour; 
- 
-        if (selectedColour !== null) { 
-            if (selectedColour === winningColour) { 
-                let winMultiplier = winningColour === 'Violet' ? 4.5 : 2; 
-                let winAmt = betAmount * winMultiplier; 
-                balance += winAmt; 
-                statusText += " | Aap Jeet Gaye ₹" + winAmt + "!"; 
-            } else { 
-                balance -= betAmount; 
-                statusText += " | Aap Haar Gaye ₹" + betAmount; 
-            } 
-        } 
- 
-        document.getElementById('balance').innerText = balance; 
-        document.getElementById('status').innerText = statusText; 
-        document.getElementById('status').style.color = "white"; 
- 
-        let historyList = document.getElementById('history-list'); 
-        let item = document.createElement('div'); 
-        item.className = 'history-item'; 
-        item.innerHTML = `
-								<span>Result: 
-									<b>${winningColour}</b>
-								</span>`; 
-        historyList.prepend(item); 
- 
-        selectedColour = null; 
-    } 
+</head>
+<body>
 
-							</script>
-						</body>
-					</html>
-				</p>
-			</body>
-		</html>
+<div class="card">
+    <h2>Colour Prediction Game</h2>
+    <div class="wallet">Coins: ₹<span id="balance">1000</span></div>
+    <div class="timer">Agla Result: <span id="timer">10</span>s</div>
+
+    <!-- Custom Bet Amount Section -->
+    <div class="bet-box">
+        <label>Bet Amount (₹): </label><br><br>
+        <input type="number" id="customBet" class="bet-input" value="100" min="10">
+        <br><br>
+        <button class="quick-btn" onclick="setBet(10)">₹10</button>
+        <button class="quick-btn" onclick="setBet(50)">₹50</button>
+        <button class="quick-btn" onclick="setBet(100)">₹100</button>
+        <button class="quick-btn" onclick="setBet(500)">₹500</button>
+    </div>
+
+    <p>Apna Colour Chune:</p>
+    <button class="btn green" onclick="placeBet('Green')">Green (2x)</button>
+    <button class="btn red" onclick="placeBet('Red')">Red (2x)</button>
+    <button class="btn violet" onclick="placeBet('Violet')">Violet (4.5x)</button>
+
+    <p id="status" style="margin-top: 15px; font-weight: bold;"></p>
+
+    <div class="history">
+        <h3>Previous Results:</h3>
+        <div id="history-list"></div>
+    </div>
+</div>
+
+<script>
+    let balance = 1000;
+    let selectedColour = null;
+    let currentBetAmount = 100;
+    let timeLeft = 10;
+
+    function setBet(amount) {
+        document.getElementById('customBet').value = amount;
+    }
+
+    function updateTimer() {
+        document.getElementById('timer').innerText = timeLeft;
+        if (timeLeft === 0) {
+            calculateResult();
+            timeLeft = 10;
+        } else {
+            timeLeft--;
+        }
+    }
+
+    setInterval(updateTimer, 1000);
+
+    function placeBet(colour) {
+        let betInput = parseFloat(document.getElementById('customBet').value);
+
+        if (isNaN(betInput) || betInput <= 0) {
+            document.getElementById('status').innerText = "Sahi Bet Amount Daalein!";
+            document.getElementById('status').style.color = "red";
+            return;
+        }
+
+        if (balance < betInput) {
+            document.getElementById('status').innerText = "Insufficient Balance!";
+            document.getElementById('status').style.color = "red";
+            return;
+        }
+
+        currentBetAmount = betInput;
+        selectedColour = colour;
+        document.getElementById('status').innerText = "Bet Placed: ₹" + currentBetAmount + " on " + colour;
+        document.getElementById('status').style.color = "#ffeb3b";
+    }
+
+    function calculateResult() {
+        let randomIndex = Math.floor(Math.random() * 10);
+        let winningColour = '';
+        
+        if (randomIndex === 0) winningColour = 'Violet';
+        else if (randomIndex % 2 === 0) winningColour = 'Green';
+        else winningColour = 'Red';
+
+        let statusText = "Result: " + winningColour;
+
+        if (selectedColour !== null) {
+            if (selectedColour === winningColour) {
+                let winMultiplier = winningColour === 'Violet' ? 4.5 : 2;
+                let winAmt = currentBetAmount * winMultiplier;
+                balance += winAmt;
+                statusText += " | Aap Jeet Gaye ₹" + winAmt + "!";
+            } else {
+                balance -= currentBetAmount;
+                statusText += " | Aap Haar Gaye ₹" + currentBetAmount;
+            }
+        }
+
+        document.getElementById('balance').innerText = balance;
+        document.getElementById('status').innerText = statusText;
+        document.getElementById('status').style.color = "white";
+
+        let historyList = document.getElementById('history-list');
+        let item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `<span>Result: <b>${winningColour}</b></span>`;
+        historyList.prepend(item);
+
+        selectedColour = null;
+    }
+</script>
+
+</body>
+</html>
