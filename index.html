@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Dashboard</title>
+    <title>Enterprise Dashboard & Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -13,6 +13,7 @@
         header { background: #150f35; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #281d58; position: sticky; top: 0; z-index: 100; }
         .menu-btn { font-size: 22px; cursor: pointer; color: #fff; background: none; border: none; }
         .logo { font-weight: bold; font-size: 18px; color: #ffab00; letter-spacing: 1px; }
+        .admin-link-btn { background: #7c4dff; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
 
         /* SIDEBAR */
         .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #0e0926; transition: 0.3s ease; z-index: 200; padding-top: 20px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
@@ -27,7 +28,7 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 150; }
         .overlay.active { display: block; }
 
-        /* MAIN CONTENT */
+        /* MAIN CONTAINER */
         .container { padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; }
 
         /* PROFILE CARD */
@@ -47,7 +48,7 @@
         .btn-green { background: #26a69a; }
         .btn-telegram { background: #0288d1; }
 
-        /* COMMUNITY JOIN CARDS */
+        /* COMMUNITY CARDS */
         .community-card { background: linear-gradient(90deg, #12092b, #1d0f44); border: 1px solid #2e185d; border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .community-info { display: flex; align-items: center; gap: 12px; }
         .community-info i { font-size: 24px; }
@@ -68,221 +69,260 @@
 
         /* BOTTOM NAVBAR */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #120929; border-top: 1px solid #26144e; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
-        .nav-item { text-align: center; color: #8e82bd; font-size: 11px; text-decoration: none; }
+        .nav-item { text-align: center; color: #8e82bd; font-size: 11px; text-decoration: none; cursor: pointer; }
         .nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
         .nav-item.active { color: #ffab00; }
+
+        /* MODAL POPUPS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #180e38; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px; border: 1px solid #4a2d8b; text-align: center; position: relative; }
+        .modal-content h3 { margin-bottom: 15px; color: #ffab00; }
+        .modal-content input { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #0c061f; color: white; box-sizing: border-box; }
+        .modal-btn { width: 100%; padding: 10px; border-radius: 6px; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; background: #7c4dff; color: white; }
+        .close-btn { position: absolute; top: 10px; right: 15px; color: #aaa; font-size: 20px; cursor: pointer; }
+
+        /* ADMIN PANEL STYLING */
+        #admin-view { display: none; padding: 15px; max-width: 900px; margin: 0 auto; width: 100%; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #180e38; padding: 15px; border-radius: 8px; border: 1px solid #331d68; }
+        .table-responsive { width: 100%; overflow-x: auto; background: #150a2e; border-radius: 8px; border: 1px solid #2d165b; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #26144e; }
+        th { background: #1d0f44; color: #ffab00; }
+        .badge-active { background: #00c853; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .badge-inactive { background: #ff1744; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header>
-        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-        <div class="logo">ENTERPRISES</div>
-    </header>
+    <!-- USER VIEW -->
+    <div id="user-view">
+        <!-- HEADER -->
+        <header>
+            <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="logo">ENTERPRISES</div>
+            <button class="admin-link-btn" onclick="showAdminLogin()"><i class="fas fa-user-shield"></i> Admin Panel</button>
+        </header>
 
-    <!-- SIDEBAR -->
-    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
-    <div class="sidebar" id="sidebar">
-        <div class="user-profile-side">
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <h4 id="side-username">Ramesh Chandra</h4>
+        <!-- SIDEBAR -->
+        <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="user-profile-side">
+                <div class="avatar"><i class="fas fa-user"></i></div>
+                <h4 id="side-username">Ramesh Chandra</h4>
+            </div>
+            <ul>
+                <li class="active" onclick="toggleSidebar()"><i class="fas fa-home"></i> Dashboard</li>
+                <li onclick="showModal('profile-modal'); toggleSidebar();"><i class="fas fa-user-circle"></i> Profile</li>
+                <li onclick="showModal('fund-modal'); toggleSidebar();"><i class="fas fa-box"></i> Purchase Package</li>
+                <li onclick="showModal('fund-modal'); toggleSidebar();"><i class="fas fa-wallet"></i> Fund Manager</li>
+                <li onclick="alert('My Team: 0 Members'); toggleSidebar();"><i class="fas fa-users"></i> Team And Network</li>
+                <li onclick="showModal('withdraw-modal'); toggleSidebar();"><i class="fas fa-money-bill-wave"></i> Wallet Withdrawal</li>
+                <li onclick="openCommunity('telegram'); toggleSidebar();"><i class="fas fa-headset"></i> Support</li>
+                <li onclick="logout();"><i class="fas fa-sign-out-alt"></i> Logout</li>
+            </ul>
         </div>
-        <ul>
-            <li class="active"><i class="fas fa-home"></i> Dashboard</li>
-            <li><i class="fas fa-user-circle"></i> Profile</li>
-            <li><i class="fas fa-box"></i> Purchase Package</li>
-            <li><i class="fas fa-wallet"></i> Fund Manager</li>
-            <li><i class="fas fa-users"></i> Team And Network</li>
-            <li><i class="fas fa-file-invoice-dollar"></i> Financial Report</li>
-            <li><i class="fas fa-shopping-cart"></i> Compound Purchase</li>
-            <li><i class="fas fa-money-bill-wave"></i> Wallet Withdrawal</li>
-            <li><i class="fas fa-headset"></i> Support</li>
-            <li><i class="fas fa-sign-out-alt"></i> Logout</li>
-        </ul>
+
+        <!-- MAIN CONTAINER -->
+        <div class="container" style="padding-bottom: 70px;">
+
+            <!-- USER PROFILE CARD -->
+            <div class="user-card">
+                <div class="row"><span class="label">NAME :</span><span class="value">Ramesh Chandra</span></div>
+                <div class="row"><span class="label">EMAIL-ID :</span><span class="value" style="color: #29b6f6;">abhishekvishkrma45@gmail.com</span></div>
+                <div class="row"><span class="label">PACKAGE :</span><span class="value" style="background:#00c853; padding:2px 8px; border-radius:4px;">₹ 1000.00</span></div>
+                <div class="row"><span class="label">STATUS :</span><span class="value"><span class="status-badge">ACTIVE</span></span></div>
+                <div class="row"><span class="label">SPONSOR ID :</span><span class="value">AD40759</span></div>
+                <div class="row"><span class="label">ACTIVE DATE :</span><span class="value">2026-08-20 15:41:50</span></div>
+            </div>
+
+            <!-- REFERRAL SECTION -->
+            <div class="ref-box">
+                <div class="ref-title">REFERRAL URL</div>
+                <input type="text" id="refLink" class="ref-input" value="https://adbharatenterprises.world/authUserRegister?affiliateCode=AD09695" readonly>
+                <div class="btn-group">
+                    <button class="btn-action btn-blue" onclick="copyReferral()"><i class="fas fa-copy"></i> COPY</button>
+                    <button class="btn-action btn-green" onclick="shareWhatsApp()"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
+                    <button class="btn-action btn-telegram" onclick="shareTelegram()"><i class="fab fa-telegram-plane"></i> TELEGRAM</button>
+                </div>
+            </div>
+
+            <!-- COMMUNITY CARDS -->
+            <div class="community-card">
+                <div class="community-info">
+                    <i class="fab fa-telegram" style="color: #0088cc;"></i>
+                    <div>
+                        <div style="font-size: 13px; font-weight: bold;">Join Our Telegram</div>
+                        <div style="font-size: 10px; color: #8f85b8;">Get the latest updates, announcements & news.</div>
+                    </div>
+                </div>
+                <button class="btn-join" onclick="openCommunity('telegram')">Join Now</button>
+            </div>
+
+            <div class="community-card">
+                <div class="community-info">
+                    <i class="fab fa-whatsapp" style="color: #25d366;"></i>
+                    <div>
+                        <div style="font-size: 13px; font-weight: bold;">Join Our WhatsApp</div>
+                        <div style="font-size: 10px; color: #8f85b8;">Get the latest updates, announcements & news.</div>
+                    </div>
+                </div>
+                <button class="btn-join" onclick="openCommunity('whatsapp')">Join Now</button>
+            </div>
+
+            <!-- STATS GRID 1 -->
+            <div class="grid-2">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #1b4332; color: #2ea043;"><i class="fas fa-wallet"></i></div>
+                    <div class="stat-info">
+                        <div class="title">TOTAL EARNINGS</div>
+                        <div class="amount">₹ 1,809.00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #0d2b45; color: #208b3a;"><i class="fas fa-briefcase"></i></div>
+                    <div class="stat-info">
+                        <div class="title">SELF BUSINESS</div>
+                        <div class="amount">₹ 1,000.00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3c096c; color: #9d4edd;"><i class="fas fa-gift"></i></div>
+                    <div class="stat-info">
+                        <div class="title">INCOME WALLET</div>
+                        <div class="amount">₹ 9.00</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #4a0e17; color: #f72585;"><i class="fas fa-box"></i></div>
+                    <div class="stat-info">
+                        <div class="title">FUND WALLET</div>
+                        <div class="amount">₹ 0.00</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS GRID -->
+            <div class="grid-4">
+                <div class="action-card" onclick="alert('Account Pehle se Active hai!')">
+                    <i class="fas fa-power-off" style="color: #00e676;"></i>
+                    <span>ACTIVATION</span>
+                </div>
+                <div class="action-card" onclick="showModal('withdraw-modal')">
+                    <i class="fas fa-university" style="color: #e040fb;"></i>
+                    <span>WITHDRAW</span>
+                </div>
+                <div class="action-card" onclick="alert('My Team: 0 Direct Members')">
+                    <i class="fas fa-users" style="color: #29b6f6;"></i>
+                    <span>MY TEAM</span>
+                </div>
+                <div class="action-card" onclick="showModal('fund-modal')">
+                    <i class="fas fa-plus-circle" style="color: #ffb300;"></i>
+                    <span>ADD FUND</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BOTTOM NAVBAR -->
+        <div class="bottom-nav">
+            <a class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'});"><i class="fas fa-home"></i>Home</a>
+            <a class="nav-item" onclick="showModal('profile-modal')"><i class="fas fa-user"></i>Profile</a>
+            <a class="nav-item" onclick="showModal('pass-modal')"><i class="fas fa-key"></i>Password</a>
+            <a class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i>Log out</a>
+        </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
-    <div class="container" style="padding-bottom: 70px;">
-
-        <!-- USER PROFILE CARD -->
-        <div class="user-card">
-            <div class="row"><span class="label">NAME :</span><span class="value">Ramesh Chandra</span></div>
-            <div class="row"><span class="label">EMAIL-ID :</span><span class="value" style="color: #29b6f6;">abhishekvishkrma45@gmail.com</span></div>
-            <div class="row"><span class="label">PACKAGE :</span><span class="value" style="background:#00c853; padding:2px 8px; border-radius:4px;">₹ 1000.00</span></div>
-            <div class="row"><span class="label">STATUS :</span><span class="value"><span class="status-badge">ACTIVE</span></span></div>
-            <div class="row"><span class="label">SPONSOR ID :</span><span class="value">AD40759</span></div>
-            <div class="row"><span class="label">ACTIVE DATE :</span><span class="value">2026-08-20 15:41:50</span></div>
-        </div>
-
-        <!-- REFERRAL SECTION -->
-        <div class="ref-box">
-            <div class="ref-title">REFERRAL URL</div>
-            <input type="text" class="ref-input" value="https://adbharatenterprises.world/authUserRegister?affiliateCode=AD09695" readonly>
-            <div class="btn-group">
-                <button class="btn-action btn-blue"><i class="fas fa-copy"></i> COPY</button>
-                <button class="btn-action btn-green"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
-                <button class="btn-action btn-telegram"><i class="fab fa-telegram-plane"></i> TELEGRAM</button>
+    <!-- ADMIN VIEW PANEL -->
+    <div id="admin-view">
+        <div class="admin-header">
+            <div>
+                <h2 style="color: #ffab00;">Admin Control Panel</h2>
+                <span style="font-size: 12px; color: #aaa;">Logged in as: <b>Admin</b></span>
             </div>
+            <button class="btn-action btn-blue" style="max-width: 120px;" onclick="closeAdmin()"><i class="fas fa-arrow-left"></i> Exit Admin</button>
         </div>
 
-        <!-- COMMUNITY CARDS -->
-        <div class="community-card">
-            <div class="community-info">
-                <i class="fab fa-telegram" style="color: #0088cc;"></i>
-                <div>
-                    <div style="font-size: 13px; font-weight: bold;">Join Our Telegram</div>
-                    <div style="font-size: 10px; color: #8f85b8;">Get the latest updates, announcements & news.</div>
-                </div>
-            </div>
-            <button class="btn-join">Join Now</button>
-        </div>
-
-        <div class="community-card">
-            <div class="community-info">
-                <i class="fab fa-whatsapp" style="color: #25d366;"></i>
-                <div>
-                    <div style="font-size: 13px; font-weight: bold;">Join Our WhatsApp</div>
-                    <div style="font-size: 10px; color: #8f85b8;">Get the latest updates, announcements & news.</div>
-                </div>
-            </div>
-            <button class="btn-join">Join Now</button>
-        </div>
-
-        <!-- STATS GRID 1 -->
+        <!-- STATS OVERVIEW -->
         <div class="grid-2">
             <div class="stat-card">
-                <div class="stat-icon" style="background: #1b4332; color: #2ea043;"><i class="fas fa-wallet"></i></div>
+                <div class="stat-icon" style="background: #1b4332; color: #2ea043;"><i class="fas fa-users"></i></div>
                 <div class="stat-info">
-                    <div class="title">TOTAL EARNINGS</div>
-                    <div class="amount">₹ 1,809.00</div>
+                    <div class="title">TOTAL USERS</div>
+                    <div class="amount" id="total-users-count">3</div>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="background: #0d2b45; color: #208b3a;"><i class="fas fa-briefcase"></i></div>
+                <div class="stat-icon" style="background: #0d2b45; color: #208b3a;"><i class="fas fa-rupee-sign"></i></div>
                 <div class="stat-info">
-                    <div class="title">SELF BUSINESS</div>
-                    <div class="amount">₹ 1,000.00</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #3c096c; color: #9d4edd;"><i class="fas fa-gift"></i></div>
-                <div class="stat-info">
-                    <div class="title">INCOME WALLET</div>
-                    <div class="amount">₹ 9.00</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #4a0e17; color: #f72585;"><i class="fas fa-box"></i></div>
-                <div class="stat-info">
-                    <div class="title">FUND WALLET</div>
-                    <div class="amount">₹ 0.00</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #38220f; color: #ffb703;"><i class="fas fa-users"></i></div>
-                <div class="stat-info">
-                    <div class="title">TEAM BUSINESS</div>
-                    <div class="amount">₹ 0.00</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #03045e; color: #00b4d8;"><i class="fas fa-hand-holding-usd"></i></div>
-                <div class="stat-info">
-                    <div class="title">TOTAL WITHDRAW</div>
-                    <div class="amount">₹ 1,800.00</div>
+                    <div class="title">TOTAL DEPOSITS</div>
+                    <div class="amount">₹ 3,000.00</div>
                 </div>
             </div>
         </div>
 
-        <!-- ACTION BUTTONS GRID -->
-        <div class="grid-4">
-            <div class="action-card">
-                <i class="fas fa-power-off" style="color: #00e676;"></i>
-                <span>ACTIVATION</span>
-            </div>
-            <div class="action-card">
-                <i class="fas fa-university" style="color: #e040fb;"></i>
-                <span>WITHDRAW</span>
-            </div>
-            <div class="action-card">
-                <i class="fas fa-users" style="color: #29b6f6;"></i>
-                <span>MY TEAM</span>
-            </div>
-            <div class="action-card">
-                <i class="fas fa-plus-circle" style="color: #ffb300;"></i>
-                <span>ADD FUND</span>
-            </div>
+        <!-- REGISTERED MEMBERS TABLE -->
+        <h3 style="margin: 15px 0; color: #b2a8d9; font-size: 15px;">Registered Members List</h3>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>User Name</th>
+                        <th>Email ID</th>
+                        <th>Sponsor ID</th>
+                        <th>Package</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="member-table-body">
+                    <!-- Dynamic Rows Loaded via JS -->
+                </tbody>
+            </table>
         </div>
-
-        <!-- STATS GRID 2 -->
-        <div class="grid-2">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #2b1055; color: #b5179e;"><i class="fas fa-user-check"></i></div>
-                <div class="stat-info">
-                    <div class="title">ACTIVE REFERRAL</div>
-                    <div class="amount">0</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #4a121a; color: #ff4d6d;"><i class="fas fa-user-times"></i></div>
-                <div class="stat-info">
-                    <div class="title">IN-ACTIVE REFERRAL</div>
-                    <div class="amount">0</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #0f381e; color: #52b788;"><i class="fas fa-users-cog"></i></div>
-                <div class="stat-info">
-                    <div class="title">ACTIVE TEAM</div>
-                    <div class="amount">0</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #3f0d14; color: #e63946;"><i class="fas fa-user-slash"></i></div>
-                <div class="stat-info">
-                    <div class="title">IN-ACTIVE TEAM</div>
-                    <div class="amount">0</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- INCOME STATUS SECTION -->
-        <div style="margin: 15px 0 10px; font-size: 14px; font-weight: bold; color: #b2a8d9;">Income Status</div>
-
-        <div class="grid-2">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #0f381e; color: #52b788;"><i class="fas fa-user-plus"></i></div>
-                <div class="stat-info">
-                    <div class="title">SIGNUP INCOME</div>
-                    <div class="amount">₹ 49.00</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon" style="background: #0d2b45; color: #2a9d8f;"><i class="fas fa-share-alt"></i></div>
-                <div class="stat-info">
-                    <div class="title">REFERRAL INCOME</div>
-                    <div class="amount">₹ 0.00</div>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- BOTTOM NAVBAR -->
-    <div class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="fas fa-home"></i>Home</a>
-        <a href="#" class="nav-item"><i class="fas fa-user"></i>Profile</a>
-        <a href="#" class="nav-item"><i class="fas fa-key"></i>Change Password</a>
-        <a href="#" class="nav-item"><i class="fas fa-sign-out-alt"></i>Log out</a>
+    <!-- MODAL POPUPS -->
+    <!-- ADMIN LOGIN MODAL -->
+    <div class="modal" id="admin-login-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('admin-login-modal')">&times;</span>
+            <h3>Admin Login</h3>
+            <input type="text" id="admin-username" placeholder="Admin Username">
+            <input type="password" id="admin-password" placeholder="Admin Password">
+            <button class="modal-btn" onclick="verifyAdminLogin()">Login to Panel</button>
+        </div>
     </div>
 
-    <script>
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
-        }
-    </script>
-</body>
-            </html>
-            
+    <!-- WITHDRAW MODAL -->
+    <div class="modal" id="withdraw-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('withdraw-modal')">&times;</span>
+            <h3>Wallet Withdrawal</h3>
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Available Income: ₹ 9.00</p>
+            <input type="number" placeholder="Enter Amount (Min ₹100)">
+            <input type="text" placeholder="Enter UPI ID / Bank Details">
+            <button class="modal-btn" onclick="alert('Withdrawal request submitted successfully!'); closeModal('withdraw-modal');">Submit Request</button>
+        </div>
+    </div>
+
+    <!-- ADD FUND MODAL -->
+    <div class="modal" id="fund-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('fund-modal')">&times;</span>
+            <h3>Add Fund / Recharge</h3>
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">UPI ID: <b>mohitcsc@jio</b></p>
+            <input type="number" placeholder="Enter Amount (e.g. 1000)">
+            <input type="text" placeholder="Enter Transaction / UTR ID">
+            <button class="modal-btn" style="background:#00c853;" onclick="alert('Fund Request Submitted!'); closeModal('fund-modal');">Submit Deposit</button>
+        </div>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div class="modal" id="profile-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('profile-modal')">&times;</span>
+            <h3>User Profile</h3>
+            <p style="font-size:14px; margin: 8px 0;">Name: <b>Ramesh Chandra</b></p>
+            <p style="font-size:14px; margin: 8px 0;">Sponsor ID: <b>AD40759</b></p>
+            <p style="font-size:14px; margin: 8px 0;">Status: <b style="colo
