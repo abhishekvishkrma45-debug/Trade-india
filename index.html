@@ -3,460 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Game Trading Hub</title>
+    <title>Enterprise Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #121212; color: white; padding: 15px; margin: 0; }
-        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; max-width: 420px; margin: 15px auto; box-shadow: 0 4px 10px rgba(0,0,0,0.5); box-sizing: border-box; }
-        .wallet { font-size: 22px; margin-bottom: 15px; color: #4caf50; font-weight: bold; }
-        .timer { font-size: 18px; color: #ffeb3b; margin-bottom: 15px; }
-        
-        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #222; color: white; font-size: 16px; box-sizing: border-box; }
-        .bet-input { width: 120px; text-align: center; display: inline-block; }
-        
-        .btn { padding: 12px 20px; font-size: 16px; border: none; cursor: pointer; border-radius: 6px; margin: 6px 0; font-weight: bold; width: 100%; box-sizing: border-box; display: block; }
-        .bet-btn { width: auto; display: inline-block; margin: 4px; }
-        .nav-btn { width: 30%; display: inline-block; font-size: 13px; padding: 8px; margin: 2px; }
-        .quick-btn { padding: 6px 12px; font-size: 12px; margin: 3px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; }
-        
-        .green { background: #4caf50; color: white; }
-        .red { background: #f44336; color: white; }
-        .violet { background: #9c27b0; color: white; }
-        .blue { background: #2196F3; color: white; }
-        .deposit-btn { background: #ff9800; color: white; margin-bottom: 5px; }
-        .withdraw-btn { background: #e91e63; color: white; margin-bottom: 15px; }
-        .logout-btn { background: #757575; color: white; margin-top: 15px; }
-        
-        /* MINES GAME GRID */
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .grid-cell { background: #333; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 28px; border-radius: 8px; cursor: pointer; user-select: none; }
-        .grid-cell.revealed { background: #444; cursor: default; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #0b071e; color: #fff; display: flex; flex-direction: column; min-height: 100vh; }
 
-        .history { margin-top: 20px; text-align: left; }
-        .history-item { padding: 8px; border-bottom: 1px solid #333; }
-        .link { color: #2196F3; cursor: pointer; text-decoration: underline; margin-top: 15px; display: inline-block; }
-        .nav-bar { background: #2a2a2a; padding: 8px; border-radius: 8px; margin-bottom: 15px; }
+        /* HEADER */
+        header { background: #150f35; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #281d58; position: sticky; top: 0; z-index: 100; }
+        .menu-btn { font-size: 22px; cursor: pointer; color: #fff; background: none; border: none; }
+        .logo { font-weight: bold; font-size: 18px; color: #ffab00; letter-spacing: 1px; }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #0e0926; transition: 0.3s ease; z-index: 200; padding-top: 20px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .sidebar.active { left: 0; }
+        .user-profile-side { padding: 20px; text-align: center; border-bottom: 1px solid #23184f; }
+        .avatar { width: 60px; height: 60px; background: #2196F3; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .sidebar ul { list-style: none; padding: 20px 0; }
+        .sidebar ul li { padding: 12px 25px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #b2a8d9; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar ul li:hover, .sidebar ul li.active { background: #1d1348; color: #fff; border-left: 4px solid #7c4dff; }
+
+        /* OVERLAY */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 150; }
+        .overlay.active { display: block; }
+
+        /* MAIN CONTENT */
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; width: 100%; }
+
+        /* PROFILE CARD */
+        .user-card { background: linear-gradient(135deg, #150a2a, #1f1140); border: 1px solid #331d68; border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .user-card .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .user-card .label { color: #8f85b8; font-weight: 500; }
+        .user-card .value { color: #fff; font-weight: bold; }
+        .status-badge { background: #00c853; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+
+        /* REFERRAL BOX */
+        .ref-box { background: #130a27; border: 1px solid #2d1859; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+        .ref-title { font-size: 12px; color: #8f85b8; text-align: center; margin-bottom: 8px; }
+        .ref-input { width: 100%; background: #090414; border: 1px solid #3d2475; padding: 10px; border-radius: 6px; color: #8f85b8; font-size: 12px; margin-bottom: 10px; text-align: center; }
+        .btn-group { display: flex; gap: 8px; }
+        .btn-action { flex: 1; padding: 10px; border: none; border-radius: 6px; color: white; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-blue { background: #29b6f6; }
+        .btn-green { background: #26a69a; }
+        .btn-telegram { background: #0288d1; }
+
+        /* COMMUNITY JOIN CARDS */
+        .community-card { background: linear-gradient(90deg, #12092b, #1d0f44); border: 1px solid #2e185d; border-radius: 10px; padding: 12px 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .community-info { display: flex; align-items: center; gap: 12px; }
+        .community-info i { font-size: 24px; }
+        .btn-join { background: #7c4dff; color: white; border: none; padding: 6px 15px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+        /* GRID STATS CARDS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .stat-card { background: linear-gradient(135deg, #180d38, #100826); border-radius: 10px; padding: 12px 15px; border: 1px solid #2c1854; display: flex; align-items: center; gap: 12px; }
+        .stat-icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .stat-info .title { font-size: 11px; color: #a499d3; text-transform: uppercase; margin-bottom: 3px; }
+        .stat-info .amount { font-size: 15px; font-weight: bold; color: #fff; }
+
+        /* QUICK ACTION BUTTONS GRID */
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .action-card { background: #150a2e; border: 1px solid #2d165b; border-radius: 10px; padding: 12px 5px; text-align: center; cursor: pointer; }
+        .action-card i { font-size: 20px; margin-bottom: 5px; display: block; }
+        .action-card span { font-size: 10px; color: #b2a8d9; text-transform: uppercase; }
+
+        /* BOTTOM NAVBAR */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #120929; border-top: 1px solid #26144e; display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; }
+        .nav-item { text-align: center; color: #8e82bd; font-size: 11px; text-decoration: none; }
+        .nav-item i { font-size: 18px; display: block; margin-bottom: 2px; }
+        .nav-item.active { color: #ffab00; }
     </style>
 </head>
 <body>
 
-<!-- AUTH SECTION -->
-<div id="auth-container" class="card">
-    <div id="login-box">
-        <h2>Login Karein</h2>
-        <input type="text" id="login-user" placeholder="Username (Mobile No.)">
-        <input type="password" id="login-pass" placeholder="Password">
-        <button class="btn blue" onclick="login()">Login</button>
-        <span class="link" onclick="showRegister()">Naya account banayein (Register)</span>
+    <!-- HEADER -->
+    <header>
+        <button class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="logo">ENTERPRISES</div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="user-profile-side">
+            <div class="avatar"><i class="fas fa-user"></i></div>
+            <h4 id="side-username">Ramesh Chandra</h4>
+        </div>
+        <ul>
+            <li class="active"><i class="fas fa-home"></i> Dashboard</li>
+            <li><i class="fas fa-user-circle"></i> Profile</li>
+            <li><i class="fas fa-box"></i> Purchase Package</li>
+            <li><i class="fas fa-wallet"></i> Fund Manager</li>
+            <li><i class="fas fa-users"></i> Team And Network</li>
+            <li><i class="fas fa-file-invoice-dollar"></i> Financial Report</li>
+            <li><i class="fas fa-shopping-cart"></i> Compound Purchase</li>
+            <li><i class="fas fa-money-bill-wave"></i> Wallet Withdrawal</li>
+            <li><i class="fas fa-headset"></i> Support</li>
+            <li><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
     </div>
 
-    <div id="register-box" style="display: none;">
-        <h2>Naya Account Banayein</h2>
-        <input type="text" id="reg-user" placeholder="Username (Mobile No.)">
-        <input type="password" id="reg-pass" placeholder="Password">
-        <button class="btn green" onclick="register()">Register</button>
-        <span class="link" onclick="showLogin()">Pehle se account hai? Login karein</span>
+    <!-- MAIN CONTAINER -->
+    <div class="container" style="padding-bottom: 70px;">
+
+        <!-- USER PROFILE CARD -->
+        <div class="user-card">
+            <div class="row"><span class="label">NAME :</span><span class="value">Ramesh Chandra</span></div>
+            <div class="row"><span class="label">EMAIL-ID :</span><span class="value" style="color: #29b6f6;">abhishekvishkrma45@gmail.com</span></div>
+            <div class="row"><span class="label">PACKAGE :</span><span class="value" style="background:#00c853; padding:2px 8px; border-radius:4px;">₹ 1000.00</span></div>
+            <div class="row"><span class="label">STATUS :</span><span class="value"><span class="status-badge">ACTIVE</span></span></div>
+            <div class="row"><span class="label">SPONSOR ID :</span><span class="value">AD40759</span></div>
+            <div class="row"><span class="label">ACTIVE DATE :</span><span class="value">2026-08-20 15:41:50</span></div>
+        </div>
+
+        <!-- REFERRAL SECTION -->
+        <div class="ref-box">
+            <div class="ref-title">REFERRAL URL</div>
+            <input type="text" class="ref-input" value="https://adbharatenterprises.world/authUserRegister?affiliateCode=AD09695" readonly>
+            <div class="btn-group">
+                <button class="btn-action btn-blue"><i class="fas fa-copy"></i> COPY</button>
+                <button class="btn-action btn-green"><i class="fab fa-whatsapp"></i> WHATSAPP</button>
+                <button class="btn-action btn-telegram"><i class="fab fa-telegram-plane"></i> TELEGRAM</button>
+            </div>
+        </div>
+
+        <!-- COMMUNITY CARDS -->
+        <div class="community-card">
+            <div class="community-info">
+                <i class="fab fa-telegram" style="color: #0088cc;"></i>
+                <div>
+                    <div style="font-size: 13px; font-weight: bold;">Join Our Telegram</div>
+                    <div style="font-size: 10px; color: #8f85b8;">Get the latest updates, announcements & news.</div>
+                </div>
+            </div>
+            <button class="btn-join">Join Now</button>
+        </div>
+
+        <div class="community-card">
+            <div class="community-info">
+                <i class="fab fa-whatsapp" style="color: #25d366;"></i>
+                <div>
+                    <div style="font-size: 13px; font-weight: bold;">Join Our WhatsApp</div>
+                    <div style="font-size: 10px; color: #8f85b8;">Get the latest updates, announcements & news.</div>
+                </div>
+            </div>
+            <button class="btn-join">Join Now</button>
+        </div>
+
+        <!-- STATS GRID 1 -->
+        <div class="grid-2">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #1b4332; color: #2ea043;"><i class="fas fa-wallet"></i></div>
+                <div class="stat-info">
+                    <div class="title">TOTAL EARNINGS</div>
+                    <div class="amount">₹ 1,809.00</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #0d2b45; color: #208b3a;"><i class="fas fa-briefcase"></i></div>
+                <div class="stat-info">
+                    <div class="title">SELF BUSINESS</div>
+                    <div class="amount">₹ 1,000.00</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #3c096c; color: #9d4edd;"><i class="fas fa-gift"></i></div>
+                <div class="stat-info">
+                    <div class="title">INCOME WALLET</div>
+                    <div class="amount">₹ 9.00</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #4a0e17; color: #f72585;"><i class="fas fa-box"></i></div>
+                <div class="stat-info">
+                    <div class="title">FUND WALLET</div>
+                    <div class="amount">₹ 0.00</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #38220f; color: #ffb703;"><i class="fas fa-users"></i></div>
+                <div class="stat-info">
+                    <div class="title">TEAM BUSINESS</div>
+                    <div class="amount">₹ 0.00</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #03045e; color: #00b4d8;"><i class="fas fa-hand-holding-usd"></i></div>
+                <div class="stat-info">
+                    <div class="title">TOTAL WITHDRAW</div>
+                    <div class="amount">₹ 1,800.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS GRID -->
+        <div class="grid-4">
+            <div class="action-card">
+                <i class="fas fa-power-off" style="color: #00e676;"></i>
+                <span>ACTIVATION</span>
+            </div>
+            <div class="action-card">
+                <i class="fas fa-university" style="color: #e040fb;"></i>
+                <span>WITHDRAW</span>
+            </div>
+            <div class="action-card">
+                <i class="fas fa-users" style="color: #29b6f6;"></i>
+                <span>MY TEAM</span>
+            </div>
+            <div class="action-card">
+                <i class="fas fa-plus-circle" style="color: #ffb300;"></i>
+                <span>ADD FUND</span>
+            </div>
+        </div>
+
+        <!-- STATS GRID 2 -->
+        <div class="grid-2">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #2b1055; color: #b5179e;"><i class="fas fa-user-check"></i></div>
+                <div class="stat-info">
+                    <div class="title">ACTIVE REFERRAL</div>
+                    <div class="amount">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #4a121a; color: #ff4d6d;"><i class="fas fa-user-times"></i></div>
+                <div class="stat-info">
+                    <div class="title">IN-ACTIVE REFERRAL</div>
+                    <div class="amount">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #0f381e; color: #52b788;"><i class="fas fa-users-cog"></i></div>
+                <div class="stat-info">
+                    <div class="title">ACTIVE TEAM</div>
+                    <div class="amount">0</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #3f0d14; color: #e63946;"><i class="fas fa-user-slash"></i></div>
+                <div class="stat-info">
+                    <div class="title">IN-ACTIVE TEAM</div>
+                    <div class="amount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INCOME STATUS SECTION -->
+        <div style="margin: 15px 0 10px; font-size: 14px; font-weight: bold; color: #b2a8d9;">Income Status</div>
+
+        <div class="grid-2">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #0f381e; color: #52b788;"><i class="fas fa-user-plus"></i></div>
+                <div class="stat-info">
+                    <div class="title">SIGNUP INCOME</div>
+                    <div class="amount">₹ 49.00</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #0d2b45; color: #2a9d8f;"><i class="fas fa-share-alt"></i></div>
+                <div class="stat-info">
+                    <div class="title">REFERRAL INCOME</div>
+                    <div class="amount">₹ 0.00</div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    
-    <p id="auth-status" style="color: red; margin-top: 10px; font-weight: bold;"></p>
-</div>
 
-<!-- MAIN CONTAINER -->
-<div id="game-container" class="card" style="display: none;">
-    <p style="color:#aaa; margin:0 0 5px 0;">Welcome, <b id="display-user">User</b></p>
-    <div class="wallet">Coins: ₹<span id="balance">0</span></div>
-    
-    <button class="btn deposit-btn" onclick="showDeposit()">+ Add Coins (Deposit)</button>
-    <button class="btn withdraw-btn" onclick="showWithdraw()">- Withdraw Money</button>
-
-    <!-- GAME NAVIGATION -->
-    <div class="nav-bar">
-        <button class="btn nav-btn blue" onclick="switchGame('colour')">Colour</button>
-        <button class="btn nav-btn red" onclick="switchGame('mines')">💣 Mines</button>
-        <button class="btn nav-btn green" onclick="switchGame('dice')">🎲 Dice</button>
+    <!-- BOTTOM NAVBAR -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active"><i class="fas fa-home"></i>Home</a>
+        <a href="#" class="nav-item"><i class="fas fa-user"></i>Profile</a>
+        <a href="#" class="nav-item"><i class="fas fa-key"></i>Change Password</a>
+        <a href="#" class="nav-item"><i class="fas fa-sign-out-alt"></i>Log out</a>
     </div>
 
-    <!-- GAME 1: COLOUR PREDICTION -->
-    <div id="colour-game">
-        <h3>Colour Prediction</h3>
-        <div class="timer">Agla Result: <span id="timer">10</span>s</div> 
-
-        <div class="bet-box">
-            <label>Bet Amount (₹): </label><br><br>
-            <input type="number" id="customBet" class="bet-input" value="10" min="10">
-            <br><br>
-            <button class="quick-btn" onclick="setBet(10)">₹10</button>
-            <button class="quick-btn" onclick="setBet(50)">₹50</button>
-            <button class="quick-btn" onclick="setBet(100)">₹100</button>
-        </div>
-
-        <p>Apna Colour Chune:</p>
-        <button class="btn bet-btn green" onclick="placeBet('Green')">Green (2x)</button>
-        <button class="btn bet-btn red" onclick="placeBet('Red')">Red (2x)</button>
-        <button class="btn bet-btn violet" onclick="placeBet('Violet')">Violet (4.5x)</button>
-
-        <p id="status" style="margin-top: 15px; font-weight: bold;"></p>
-
-        <div class="history">
-            <h4>Previous Results:</h4>
-            <div id="history-list"></div>
-        </div>
-    </div>
-
-    <!-- GAME 2: MINES (BOMB GAME) -->
-    <div id="mines-game" style="display: none;">
-        <h3>💣 Bomb Sweeper</h3>
-        <p style="font-size: 13px; color: #ccc;">9 Boxes me se 1 Bomb hai. Gems dhundhein aur jeetein!</p>
-        
-        <div class="bet-box">
-            <label>Bet Amount (₹): </label>
-            <input type="number" id="minesBet" class="bet-input" value="20" min="10">
-            <button class="btn green" id="startMinesBtn" onclick="startMinesGame()">Start Game</button>
-        </div>
-
-        <div class="grid" id="minesGrid">
-            <!-- 9 Cells generated by JS -->
-        </div>
-
-        <button class="btn deposit-btn" id="cashoutBtn" onclick="cashoutMines()" style="display: none;">Cash Out (Take Profit)</button>
-        <p id="minesStatus" style="font-weight: bold; margin-top: 10px;"></p>
-    </div>
-
-    <!-- GAME 3: DICE ROLL -->
-    <div id="dice-game" style="display: none;">
-        <h3>🎲 Lucky Dice Roll</h3>
-        <p style="font-size: 13px; color: #ccc;">Number 1 se 6 choose karein. Sahi hone par 5x payout!</p>
-
-        <div class="bet-box">
-            <label>Bet Amount (₹): </label>
-            <input type="number" id="diceBet" class="bet-input" value="10" min="10">
-        </div>
-
-        <p>Apna Lucky Number Chune:</p>
-        <div>
-            <button class="quick-btn" style="padding: 10px 15px; font-size:16px;" onclick="rollDice(1)">1</button>
-            <button class="quick-btn" style="padding: 10px 15px; font-size:16px;" onclick="rollDice(2)">2</button>
-            <button class="quick-btn" style="padding: 10px 15px; font-size:16px;" onclick="rollDice(3)">3</button>
-            <button class="quick-btn" style="padding: 10px 15px; font-size:16px;" onclick="rollDice(4)">4</button>
-            <button class="quick-btn" style="padding: 10px 15px; font-size:16px;" onclick="rollDice(5)">5</button>
-            <button class="quick-btn" style="padding: 10px 15px; font-size:16px;" onclick="rollDice(6)">6</button>
-        </div>
-
-        <p id="diceStatus" style="font-weight: bold; margin-top: 15px;"></p>
-    </div>
-
-    <button class="btn logout-btn" onclick="logout()">Logout</button>
-</div>
-
-<!-- DEPOSIT POPUP BOX -->
-<div id="deposit-box" class="card" style="display: none;">
-    <h2>Deposit / Recharge</h2>
-    <p>Is UPI ID par PhonePe/GPay se payment karein:</p>
-    <p style="background: #333; padding: 12px; border-radius: 6px; font-weight: bold; color: #ffeb3b; font-size: 18px; user-select: all;">mohitcsc@jio</p>
-    
-    <input type="number" id="dep-amount" placeholder="Amount (e.g. 100)">
-    <input type="text" id="dep-utr" placeholder="UTR / Transaction ID">
-    
-    <button class="btn green" onclick="submitDeposit()">Submit Deposit Request</button>
-    <button class="btn logout-btn" onclick="closeDeposit()">Back to Game</button>
-    <p id="dep-status" style="margin-top: 10px; font-weight: bold;"></p>
-</div>
-
-<!-- WITHDRAW POPUP BOX -->
-<div id="withdraw-box" class="card" style="display: none;">
-    <h2>Withdrawal Request</h2>
-    <p>Minimum Withdrawal: ₹100</p>
-    
-    <input type="number" id="with-amount" placeholder="Amount (e.g. 200)">
-    <input type="text" id="with-upi" placeholder="Apna UPI ID / Bank Details">
-    
-    <button class="btn withdraw-btn" onclick="submitWithdraw()">Submit Withdrawal</button>
-    <button class="btn logout-btn" onclick="closeWithdraw()">Back to Game</button>
-    <p id="with-status" style="margin-top: 10px; font-weight: bold;"></p>
-</div>
-
-<script>
-    let currentUser = null;
-    let balance = 0;
-
-    // --- AUTH LOGIC ---
-    function showRegister() {
-        document.getElementById('login-box').style.display = 'none';
-        document.getElementById('register-box').style.display = 'block';
-        document.getElementById('auth-status').innerText = "";
-    }
-
-    function showLogin() {
-        document.getElementById('register-box').style.display = 'none';
-        document.getElementById('login-box').style.display = 'block';
-        document.getElementById('auth-status').innerText = "";
-    }
-
-    function register() {
-        let user = document.getElementById('reg-user').value.trim();
-        let pass = document.getElementById('reg-pass').value.trim();
-
-        if(!user || !pass) {
-            document.getElementById('auth-status').innerText = "Sahi details bharein!";
-            return;
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
         }
-        
-        if(localStorage.getItem(user) !== null) {
-            document.getElementById('auth-status').innerText = "Username pehle se majood hai!";
-            return;
-        }
-
-        localStorage.setItem(user, JSON.stringify({ password: pass, coins: 100 }));
-        document.getElementById('auth-status').style.color = "green";
-        document.getElementById('auth-status').innerText = "Account ban gaya! Bonus ₹100 Added. Ab Login Karein.";
-        setTimeout(showLogin, 1500);
-    }
-
-    function login() {
-        let user = document.getElementById('login-user').value.trim();
-        let pass = document.getElementById('login-pass').value.trim();
-
-        let userData = JSON.parse(localStorage.getItem(user));
-
-        if(userData && userData.password === pass) {
-            currentUser = user;
-            balance = userData.coins;
+    </script>
+</body>
+            </html>
             
-            document.getElementById('display-user').innerText = currentUser;
-            document.getElementById('balance').innerText = balance;
-            
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-            initMinesGrid();
-        } else {
-            document.getElementById('auth-status').style.color = "red";
-            document.getElementById('auth-status').innerText = "Username ya Password galat hai!";
-        }
-    }
-
-    function logout() {
-        currentUser = null;
-        document.getElementById('game-container').style.display = 'none';
-        document.getElementById('auth-container').style.display = 'block';
-        document.getElementById('login-user').value = "";
-        document.getElementById('login-pass').value = "";
-        document.getElementById('auth-status').innerText = "";
-    }
-
-    function updateDatabaseBalance() {
-        if(currentUser) {
-            let userData = JSON.parse(localStorage.getItem(currentUser));
-            userData.coins = balance;
-            localStorage.setItem(currentUser, JSON.stringify(userData));
-        }
-    }
-
-    function switchGame(gameType) {
-        document.getElementById('colour-game').style.display = 'none';
-        document.getElementById('mines-game').style.display = 'none';
-        document.getElementById('dice-game').style.display = 'none';
-
-        if(gameType === 'colour') document.getElementById('colour-game').style.display = 'block';
-        if(gameType === 'mines') document.getElementById('mines-game').style.display = 'block';
-        if(gameType === 'dice') document.getElementById('dice-game').style.display = 'block';
-    }
-
-    // --- DEPOSIT & WITHDRAW ---
-    function showDeposit() {
-        document.getElementById('game-container').style.display = 'none';
-        document.getElementById('deposit-box').style.display = 'block';
-    }
-    function closeDeposit() {
-        document.getElementById('deposit-box').style.display = 'none';
-        document.getElementById('game-container').style.display = 'block';
-    }
-    function submitDeposit() {
-        let amt = parseFloat(document.getElementById('dep-amount').value);
-        let utr = document.getElementById('dep-utr').value.trim();
-
-        if(!amt || amt <= 0 || !utr) {
-            document.getElementById('dep-status').innerText = "Kripya Sahi Amount aur UTR bharein!";
-            document.getElementById('dep-status').style.color = "red";
-            return;
-        }
-
-        balance += amt;
-        updateDatabaseBalance();
-        document.getElementById('balance').innerText = balance;
-
-        document.getElementById('dep-status').innerText = "Deposit Successful! ₹" + amt + " Added.";
-        document.getElementById('dep-status').style.color = "green";
-        
-        setTimeout(() => {
-            closeDeposit();
-            document.getElementById('dep-status').innerText = "";
-            document.getElementById('dep-amount').value = "";
-            document.getElementById('dep-utr').value = "";
-        }, 1500);
-    }
-
-    function showWithdraw() {
-        document.getElementById('game-container').style.display = 'none';
-        document.getElementById('withdraw-box').style.display = 'block';
-    }
-    function closeWithdraw() {
-        document.getElementById('withdraw-box').style.display = 'none';
-        document.getElementById('game-container').style.display = 'block';
-    }
-    function submitWithdraw() {
-        let amt = parseFloat(document.getElementById('with-amount').value);
-        let upi = document.getElementById('with-upi').value.trim();
-
-        if(!amt || amt < 100) {
-            document.getElementById('with-status').innerText = "Minimum Withdrawal ₹100 hona chahiye!";
-            document.getElementById('with-status').style.color = "red";
-            return;
-        }
-
-        if(amt > balance) {
-            document.getElementById('with-status').innerText = "Aapke paas itna Balance nahi hai!";
-            document.getElementById('with-status').style.color = "red";
-            return;
-        }
-
-        if(!upi) {
-            document.getElementById('with-status').innerText = "Kripya UPI ID bharein!";
-            document.getElementById('with-status').style.color = "red";
-            return;
-        }
-
-        balance -= amt;
-        updateDatabaseBalance();
-        document.getElementById('balance').innerText = balance;
-
-        document.getElementById('with-status').innerText = "Withdrawal Request Submitted!";
-        document.getElementById('with-status').style.color = "green";
-
-        setTimeout(() => {
-            closeWithdraw();
-            document.getElementById('with-status').innerText = "";
-            document.getElementById('with-amount').value = "";
-            document.getElementById('with-upi').value = "";
-        }, 1500);
-    }
-
-    // --- GAME 1: COLOUR PREDICTION ---
-    let selectedColour = null;
-    let currentBetAmount = 10;
-    let timeLeft = 10;
-
-    function setBet(amount) { document.getElementById('customBet').value = amount; }
-
-    function updateTimer() {
-        if(!currentUser) return;
-        document.getElementById('timer').innerText = timeLeft;
-        if (timeLeft === 0) {
-            calculateResult();
-            timeLeft = 10;
-        } else {
-            timeLeft--;
-        }
-    }
-    setInterval(updateTimer, 1000);
-
-    function placeBet(colour) {
-        let betInput = parseFloat(document.getElementById('customBet').value);
-
-        if (isNaN(betInput) || betInput <= 0 || balance < betInput) {
-            document.getElementById('status').innerText = "Insufficient Balance ya Galat Amount!";
-            document.getElementById('status').style.color = "red";
-            return;
-        }
-
-        currentBetAmount = betInput;
-        selectedColour = colour;
-        document.getElementById('status').innerText = "Bet Placed: ₹" + currentBetAmount + " on " + colour;
-        document.getElementById('status').style.color = "#ffeb3b";
-    }
-
-    function calculateResult() {
-        let randomIndex = Math.floor(Math.random() * 10);
-        let winningColour = '';
-        
-        if (randomIndex === 0) winningColour = 'Violet';
-        else if (randomIndex % 2 === 0) winningColour = 'Green';
-        else winningColour = 'Red';
-
-        let statusText = "Result: " + winningColour;
-
-        if (selectedColour !== null) {
-            if (selectedColour === winningColour) {
-                let winMultiplier = winningColour === 'Violet' ? 4.5 : 2;
-                let winAmt = currentBetAmount * winMultiplier;
-                balance += winAmt;
-                statusText += " | Aap Jeet Gaye ₹" + winAmt + "!";
-            } else {
-                balance -= currentBetAmount;
-                statusText += " | Aap Haar Gaye ₹" + currentBetAmount;
-            }
-            updateDatabaseBalance();
-        }
-
-        document.getElementById('balance').innerText = balance;
-        document.getElementById('status').innerText = statusText;
-        document.getElementById('status').style.color = "white";
-
-        let historyList = document.getElementById('history-list');
-        let item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `<span>Result: <b>${winningColour}</b></span>`;
-        historyList.prepend(item);
-
-        selectedColour = null;
-    }
-
-    // --- GAME 2: MINES (BOMB GAME) ---
-    let bombIndex = -1;
-    let minesActive = false;
-    let minesBetAmt = 0;
-    let gemsFound = 0;
-
-    function initMinesGrid() {
-        let grid = document.getElementById('minesGrid');
-        grid.innerHTML = '';
-        for(let i=0; i<9; i++) {
-            let cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.innerText = '?';
-            cell.onclick = () => revealMinesCell(i, cell);
-            grid.appendChild(cell);
-        }
-    }
-
-    function startMinesGame() {
-        let betAmt = parseFloat(document.getElementById('minesBet').value);
-        if(!betAmt || betAmt <= 0 || balance < betAmt) {
-            document.getElementById('minesStatus').innerText = "Insufficient Balance!";
-            document.getElementById('minesStatus').style.color = "red";
-            return;
-        }
-
-        balance -= betAmt;
-        minesBetAmt = betAmt;
-        updateDatabaseBalance();
-        document.getElementById('balance').innerText = balance;
-
-        bombIndex = Math.floor(Math.random() * 9);
-        minesActive = true;
-        gemsFound = 0;
-
-        initMinesGrid();
-        document.getElementById('startMinesBtn').style.display = 'none';
-        document.getElementById('cashoutBtn').style.display = 'none';
-        document.getElementById('minesStatus').innerText = "Game Started! Box Kholein.";
-        document.getElementById('minesStatus').style.color = "#ffeb3b";
-    }
-
-    function revealMinesCell(index, cell) {
-        if(!minesActive || cell.classList.contains('revealed')) return;
-
-        cell.classList.add('revealed');
-
-        if(index === bombIndex) {
-            cell.innerText = '💣';
-            cell.style.background = '#f44336';
-            document.getElementById('minesStatus').innerText
